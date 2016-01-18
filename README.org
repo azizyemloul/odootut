@@ -1,5 +1,5 @@
 * Création de module
-La [[https://www.odoo.com/documentation/9.0/howtos/backend.html][documentation]] de odoo est quelques fois trompeuses.
+La [[https://www.odoo.com/documentation/9.0/howtos/backend.html][documentation]] de odoo est quelques fois incomplète voire trompeuse.
 La commande suivante ne donne pas le résultat attendu
 #+BEGIN_SRC sh
 odoo.py scaffold openacademy addons
@@ -20,7 +20,7 @@ Résultat :
 └── security
     └── ir.model.access.csv
 #+END_EXAMPLE
-Observation[fn:2]
+Observations importantes [fn:2]
 * Composition de base
 - [[__openerp__.py][__openrp__.py]]
 - [[__init__.py]]
@@ -83,7 +83,26 @@ Trois enregistrements sont déclarés dans ce fichier.
 PATH=$PATH:$HOME/odoo/
 #+END_SRC
 
-[fn:2] J'ai utilisé odoo.py v8 le résultat peut probablement être quelque peut différent sur la v9
+[fn:2] odoo.py de la version v8 donne un résultat différent que celui du v9. La documentation semble basée sur la v8.
+#+BEGIN_EXAMPLE
+.
+├── controllers
+│   ├── controllers.py
+│   └── __init__.py
+├── demo
+│   └── demo.xml
+├── __init__.py
+├── models
+│   ├── __init__.py
+│   └── models.py
+├── __openerp__.py
+├── __openerp__.py~
+├── security
+│   └── ir.model.access.csv
+└── views
+    ├── templates.xml
+    └── views.xml
+#+END_EXAMPLE
 
 [fn:3] Les discussions autour de la raison d'exister de ce fichier dans un package python sont nombreuses et je n'ai pas eu le temps de tout entourer.
 - Un rapport avec le statut de [[http://docs.python-guide.or/en/latest/writing/structure/#packages][package]]
