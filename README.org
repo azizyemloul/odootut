@@ -1,0 +1,97 @@
+* Création de module
+La [[https://www.odoo.com/documentation/9.0/howtos/backend.html][documentation]] de odoo est quelques fois trompeuses.
+La commande suivante ne donne pas le résultat attendu
+#+BEGIN_SRC sh
+odoo.py scaffold openacademy addons
+#+END_SRC
+Il faut corriger :[fn:1]
+#+BEGIN_SRC sh
+./odoo.py scaffold openacademy addons
+#+END_SRC
+Résultat :
+#+BEGIN_EXAMPLE
+.
+├── __openerp__.py
+├── __init__.py
+├── controllers.py
+├── models.py
+├── demo.xml
+├── templates.xml
+└── security
+    └── ir.model.access.csv
+#+END_EXAMPLE
+Observation[fn:2]
+* Composition de base
+- [[__openerp__.py][__openrp__.py]]
+- [[__init__.py]]
+- [[controllers.py]] : laissé vide ou commenté par défaut
+- [[models.py]] : laissé vide ou commenté par défaut
+- [[demo.xml]] : laissé vide  ou commenté par défaut
+- [[security/ir.model.access.csv]] : valeurs par défaut
+- [[templates.xml]] : laissé vide ou commenté par défaut
+**  [[__openerp__.py][__openrp__.py]]
+Est appelé fichier manifest. Sous forme de [[http://www.tutorialspoint.com/python/python_dictionary.htm][dictionnaire]] {clé0:valeur0,clé1:valeur1,...}, valeurs pouvant être des [[www.tutorialspoint.com/python/python_lists.htm][listes]].
+** [[__init__.py]]
+Nécessaire mais dont les implications sont complexes.[fn:3]
+* [[https://www.odoo.com/documentation/9.0/howtos/backend.html#object-relational-mapping][ORM]]
+The most important attribute is ~_name~ which is required and defines the name for the model.
+** [[models.py]]
+#+BEGIN_SRC python
+from openerp import models, fields, api
+
+class Course(models.Model):
+    _name = 'openacademy.course'
+
+    name = fields.Char(string="Title", required=True)
+    description = fields.Text()
+#+END_SRC
+~name~ et ~description~ sont ici les attribus de la class ~Course~.
+Le champs ~name~ est [[https://www.odoo.com/documentation/9.0/howtos/backend.html#special-fields][requis]] pour permettre l'affichage et les recherches.
+* Les fichiers de données (Data files)
+Les données des modules sont déclarées dans les fichiers XML avec l'élément ~<record>~.
+Chaque ~<record>~ crée ou met à jour un enregistrement dans la base de données (postgresql).
+- ~<record>~ comporte deux attribus :
+  - ~model~ qui correspond à l'attribu ~_name~ déclaré dans la définition de la class dans [[models.py]]. ici ~openacademy.course~
+  - ~id~ un [[https://www.odoo.com/documentation/9.0/glossary.html#term-external-identifier][identifiant externe]] permettant de faire référence à l'enregistrement sans savoir l'index automatique généré par la gestionnaire de la base de données.
+    - ~<field>~ comporte les attribus déclarés dans [[models.py]]. En ce qui concerne cet exemple ~name~ et ~description~
+      - seul ~name~ est requis
+      - ~description~ peut être vide mais peut comporter plusieurs lignes car déclarée de type ~Text~ dans [[models.py]]
+** [[demo.xml]]
+Trois enregistrements sont déclarés dans ce fichier.
+#+BEGIN_SRC xml
+<record model="openacademy.course" id="course0">
+  <field name="name">Course 0</field>
+  <field name="description">Course 0's description
+
+  Can have multiple lines
+  </field>
+</record>
+<record model="openacademy.course" id="course1">
+  <field name="name">Course 1</field>
+  <!-- no description for this one -->
+</record>
+<record model="openacademy.course" id="course2">
+  <field name="name">Course 2</field>
+  <field name="description">Course 2's description</field>
+</record>
+#+END_SRC
+
+* Renvois
+[fn:1] Pourquoi ça ne marche pas ? Pour que la première formule fonctionne il faut que ~odoo.py~ soit dans le ~PATH~.
+~PATH~ est une variable d'environnement du shell. Elle peut-être définie soit en ligne de commande soit dans le fichier d'initialisation du shell ~$HOME/.bashrc~ par exemple.
+#+BEGIN_SRC sh
+PATH=$PATH:$HOME/odoo/
+#+END_SRC
+
+[fn:2] J'ai utilisé odoo.py v8 le résultat peut probablement être quelque peut différent sur la v9
+
+[fn:3] Les discussions autour de la raison d'exister de ce fichier dans un package python sont nombreuses et je n'ai pas eu le temps de tout entourer.
+- Un rapport avec le statut de [[http://docs.python-guide.or/en/latest/writing/structure/#packages][package]]
+- Un rapport avec les espaces de nom des variables utilisées dans le package.
+- Les statuts public ou privé du package
+- et autres
+https://www.reddit.com/r/Python/comments/1bbbwk/whats_your_opinion_on_what_to_include_in_init_py/
+http://foobar.lu/wp/2012/05/13/a-comprehensive-step-through-python-packaging-a-k-a-setup-scripts/
+http://stackoverflow.com/questions/1801878/the-pythonic-way-of-organizing-modules-and-packages
+http://stackoverflow.com/questions/1944569/how-do-i-write-good-correct-init-py-files
+http://stackoverflow.com/questions/2360724/in-python-what-exactly-does-import-import
